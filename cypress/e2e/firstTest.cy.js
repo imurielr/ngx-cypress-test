@@ -128,4 +128,40 @@ describe('Our first suite', () => {
         cy.wrap(input).invoke('prop', 'value').should('contain', 'Jul 17, 2022')
       })
   })
+
+  it('radio button', () => {
+    cy.visit('/')
+    cy.contains('Forms').click()
+    cy.contains('Form Layouts').click()
+
+    cy.contains('nb-card', 'Using the Grid')
+      .find('[type="radio"]')
+      .then(radioButtons => {
+        cy.wrap(radioButtons)
+          .first()
+          .check({ force: true })
+          .should('be.checked')
+
+        cy.wrap(radioButtons)
+          .eq(1) // Obtener valor en index 1
+          .check({ force: true })
+
+        cy.wrap(radioButtons)
+          .first() // lo mismo que .eq(0)
+          .should('not.be.checked')
+
+        cy.wrap(radioButtons)
+          .eq(2)
+          .should('be.disabled')
+      })
+  })
+
+  it.only('checkboxes', () => {
+    cy.visit('/')
+    cy.contains('Modal & Overlays').click()
+    cy.contains('Toastr').click()
+
+    cy.get('[type="checkbox"]').check({ force: true }) // solo checkea, no se puede descheckear con .check()
+    cy.get('[type="checkbox"]').eq(0).click({ force: true })
+  })
 })
