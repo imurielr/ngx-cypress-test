@@ -34,9 +34,9 @@ describe('Our first suite', () => {
     cy.contains('Form Layouts').click()
 
     cy.get('[data-cy="signInButton"]')
-    
+
     cy.contains('Sign in') // Fist match
-    
+
     cy.contains('[status="warning"]', 'Sign in') // Web element con atributo status=warning
 
     /** 
@@ -59,5 +59,73 @@ describe('Our first suite', () => {
     cy.contains('nb-card', 'Horizontal form') // Encuentra el nb-card que contiene el texto Horizontal form
       .find('[type="email"]')
 
+  })
+
+  it('then and wrap methods', () => {
+    cy.visit('/')
+    cy.contains('Forms').click()
+    cy.contains('Form Layouts').click()
+
+    cy.contains('nb-card', 'Using the Grid').find('[for="inputEmail1"]').should('contain', 'Email')
+    cy.contains('nb-card', 'Using the Grid').find('[for="inputPassword2"]').should('contain', 'Password')
+    cy.contains('nb-card', 'Basic form').find('[for="exampleInputEmail1"]').should('contain', 'Email')
+    cy.contains('nb-card', 'Basic form').find('[for="exampleInputPassword1"]').should('contain', 'Password')
+
+    // EVITAR REPETIR LOS LOCATORS
+    cy.contains('nb-card', 'Using the Grid').then((firstForm) => {
+      const emailLabelFirst = firstForm.find('[for="inputEmail1"]').text() // Cuando se usa el .then el metodo find no retorna un objeto cypress sino uno JQuery
+      const passwordLabelFirst = firstForm.find('[for="inputPassword2"]').text() // Los elementos cypress no se pueden guardar en variables, los JQuery si
+
+      expect(emailLabelFirst).to.equal('Email')
+      expect(passwordLabelFirst).to.equal('Password')
+
+      cy.contains('nb-card', 'Basic form').then((secondForm) => {
+        const passwordLabelSecond = secondForm.find('[for="exampleInputPassword1"]').text()
+        expect(passwordLabelFirst).to.equal(passwordLabelSecond)
+
+        cy.wrap(secondForm).find('[for="exampleInputPassword1"]').should('contain', 'Password') // Wrap convierte el resultado JQuery en un elemento Cypress
+      })
+    })
+  })
+
+  it('invoke command', () => {
+    cy.visit('/')
+    cy.contains('Forms').click()
+    cy.contains('Form Layouts').click()
+
+    // GET THE TEXT VALUE FROM WEB PAGE:
+    // 1
+    cy.get('[for="exampleInputEmail1"]').should('contain', 'Email address')
+
+    // 2
+    cy.get('[for="exampleInputEmail1"]').then(label => {
+      expect(label.text()).to.equal('Email address')
+    })
+
+    // 3
+    cy.get('[for="exampleInputEmail1"]').invoke('text').then(text => { // Invoca la función del JQuery y lo guarda como variable
+      expect(text).to.equal('Email address')
+    })
+
+    cy.contains('nb-card', 'Basic form')
+      .find('nb-checkbox')
+      .click()
+      .find('.custom-checkbox')
+      .invoke('attr', 'class')
+      .should('contain', 'checked')
+  })
+
+  it('assert property', () => {
+    cy.visit('/')
+    cy.contains('Forms').click()
+    cy.contains('Datepicker').click()
+
+    cy.contains('nb-card', 'Common Datepicker')
+      .find('input')
+      .then(input => {
+        cy.wrap(input).click()
+        cy.get('nb-calendar-day-picker').contains('17').click()
+        cy.wrap(input).invoke('prop', 'value').should('contain', 'Jul 17, 2022')
+      })
   })
 })
