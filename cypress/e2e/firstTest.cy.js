@@ -145,7 +145,8 @@ describe('Our first suite', () => {
         cy.wrap(input).click()
         let dateAssert = selectDayFromCurrent(198)
 
-        cy.wrap(input).invoke('prop', 'value').should('contain', dateAssert)
+        cy.wrap(input).invoke('prop', 'value').should('contain', dateAssert) // HACEN LO MISMO
+        cy.wrap(input).should('have.value', dateAssert) // HACEN LO MISMO
       })
   })
 
