@@ -115,7 +115,26 @@ describe('Our first suite', () => {
       .should('contain', 'checked')
   })
 
-  it('assert property', () => {
+  it.only('assert property - V2. Date pickers', () => {
+    function selectDayFromCurrent(days) {
+      let date = new Date()
+      date.setDate(date.getDate() + days)
+      let futureDay = date.getDate()
+      let futureMonth = date.toLocaleString('en-US', { month: 'short' })
+      let dateAssert = `${futureMonth} ${futureDay}, ${date.getFullYear()}`
+
+      cy.get('nb-calendar-navigation').invoke('attr', 'ng-reflect-date').then(dateAttribute => {
+        if (!dateAttribute.includes(futureMonth)) {
+          cy.get('[data-name="chevron-right"').click()
+          selectDayFromCurrent(days)
+        } else {
+          cy.get('nb-calendar-day-picker [class="day-cell ng-star-inserted"]').contains(futureDay).click()
+        }
+      })
+
+      return dateAssert
+    }
+
     cy.visit('/')
     cy.contains('Forms').click()
     cy.contains('Datepicker').click()
@@ -124,8 +143,9 @@ describe('Our first suite', () => {
       .find('input')
       .then(input => {
         cy.wrap(input).click()
-        cy.get('nb-calendar-day-picker').contains('17').click()
-        cy.wrap(input).invoke('prop', 'value').should('contain', 'Jul 17, 2022')
+        let dateAssert = selectDayFromCurrent(198)
+
+        cy.wrap(input).invoke('prop', 'value').should('contain', dateAssert)
       })
   })
 
