@@ -35,6 +35,7 @@
 //     }
 //   }
 // }
+import 'cypress-plugin-snapshots/commands';
 
 Cypress.Commands.add('openHomePage', () => {
   cy.visit('/')
